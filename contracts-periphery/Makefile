@@ -12,7 +12,12 @@ forkBlock = 14800081
 build :; forge build
 clean :; forge clean
 install :; $(INSTALL_CMD)
+<<<<<<< HEAD
 snapshot-gas :; forge test -f ${ETH_RPC_URL} --fork-block-number ${forkBlock} --match-path *.gas.t.sol --gas-report > snapshot/.gas
+=======
+snapshot :; forge snapshot -f ${ETH_RPC_URL} --fork-block-number ${forkBlock} --match-path *.gas.t.sol
+snapshot-diff :; forge snapshot --diff -f ${ETH_RPC_URL} --fork-block-number ${forkBlock} --match-path *.gas.t.sol
+>>>>>>> 2ba3b6e (Update loops)
 test :; make test-contracts test-gas
 test-contracts :; make test-batch-send test-uniswap-hook
 test-batch-send :; forge test --match-path test/UmbraBatchSend.t.sol
