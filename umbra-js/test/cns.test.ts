@@ -1,19 +1,12 @@
 import '@nomiclabs/hardhat-ethers';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { default as Resolution, Eip1993Factories } from '@unstoppabledomains/resolution';
+import { default as Resolution } from '@unstoppabledomains/resolution';
 import * as cns from '../src/utils/cns';
 import { expectRejection } from './utils';
 
 const ethersProvider = ethers.provider;
-const resolution = new Resolution({
-  sourceConfig: {
-    cns: {
-      provider: Eip1993Factories.fromEthersProvider(ethersProvider),
-      network: 'rinkeby',
-    },
-  },
-});
+const resolution = new Resolution();
 
 // Truth parameters to test against
 const name = 'udtestdev-msolomon.crypto';
