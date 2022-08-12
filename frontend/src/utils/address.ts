@@ -2,12 +2,13 @@
  * @notice Helpers for managing and displaying addresses
  */
 
-import { CnsQueryResponse, Provider } from 'components/models';
+import {  Provider } from 'components/models';
 import { utils } from '@umbra/umbra-js';
 import { MAINNET_PROVIDER } from 'src/utils/constants';
 import { getAddress, Web3Provider } from 'src/utils/ethers';
 import { getChainById } from 'src/utils/utils';
 import { i18n } from '../boot/i18n';
+import Resolution from '@unstoppabledomains/resolution';
 // ================================================== Address Helpers ==================================================
 
 // Returns an address with the following format: 0x1234...abcd
@@ -41,20 +42,9 @@ export const lookupEnsName = async (address: string, provider: Provider) => {
 export const lookupCnsName = async (address: string) => {
   try {
     // Send request to get names
-    const url = 'https://api.thegraph.com/subgraphs/name/unstoppable-domains-integrations/dot-crypto-registry';
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        variables: { owner: address.toLowerCase() },
-        query: 'query domainsOfOwner($owner: String!) { domains(where: {owner: $owner}) { name } }',
-      }),
-    });
-
-    // Return the first name in the array, or null if user has no CNS names
-    const json = (await res.json()) as CnsQueryResponse;
-    const names = json.data.domains;
-    return names.length > 0 ? names[0].name : null;
+    const resolution = new Resolution();
+    const domain = await resolution.reverse(address)
+    return domain
   } catch (err) {
     // Scenario that prompted this try/catch was that The Graph API threw with a CORS error on localhost, blocking login
     console.warn('Error in lookupCnsName');
@@ -65,11 +55,11 @@ export const lookupCnsName = async (address: string) => {
 
 // Returns an ENS or CNS name if found, otherwise returns null
 const lookupEnsOrCns = async (address: string, provider: Provider) => {
-  const ensName = await lookupEnsName(address, provider);
-  if (ensName) return ensName;
-
   const cnsName = await lookupCnsName(address);
   if (cnsName) return cnsName;
+
+  const ensName = await lookupEnsName(address, provider);
+  if (ensName) return ensName;
 
   return null;
 };

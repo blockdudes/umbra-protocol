@@ -20,7 +20,7 @@ import {
 } from '../ethers';
 import { Point, Signature, recoverPublicKey } from 'noble-secp256k1';
 import { ens, cns } from '..';
-import { default as Resolution, Eip1993Factories } from '@unstoppabledomains/resolution';
+import { default as Resolution } from '@unstoppabledomains/resolution';
 import { StealthKeyRegistry } from '../classes/StealthKeyRegistry';
 import { TxHistoryProvider } from '../classes/TxHistoryProvider';
 import { EthersProvider, TransactionResponseExtended } from '../types';
@@ -163,7 +163,7 @@ export async function toAddress(name: string, provider: EthersProvider) {
   if (address) return address;
 
   // Then try CNS
-  address = await resolveCns(name, provider); // will never throw, but returns null on failure
+  address = await resolveCns(name); // will never throw, but returns null on failure
   if (address) return address;
 
   return getAddress(name);
@@ -259,7 +259,7 @@ export async function getPublicKeysLegacy(name: string, provider: EthersProvider
     return ens.getPublicKeys(name, provider);
   } catch (e) {
     // Fallback to CNS
-    return cns.getPublicKeys(name, provider, getResolutionInstance(provider));
+    return cns.getPublicKeys(name, provider, getResolutionInstance());
   }
 }
 
@@ -276,19 +276,9 @@ export function isDomain(name: string) {
 
 /**
  * @notice Returns an instance of the UD Resolution library
- * @param provider ethers provider instance
  */
-function getResolutionInstance(provider: EthersProvider) {
-  // If network name is homestead, use 'mainnet' as the network name
-  const networkName = provider.network.name === 'homestead' ? 'mainnet' : provider.network.name;
-  return new Resolution({
-    sourceConfig: {
-      cns: {
-        provider: Eip1993Factories.fromEthersProvider(provider),
-        network: networkName as 'mainnet' | 'rinkeby',
-      },
-    },
-  });
+function getResolutionInstance() {
+  return new Resolution();
 }
 
 /**
@@ -316,12 +306,11 @@ async function resolveEns(name: string, provider: EthersProvider) {
 /**
  * @notice Attempt to resolve a CNS name, and return null on failure
  * @param name
- * @param provider
  * @returns
  */
-async function resolveCns(name: string, provider: EthersProvider) {
+async function resolveCns(name: string) {
   try {
-    const resolution = getResolutionInstance(provider);
+    const resolution = getResolutionInstance();
     const address = await resolution.addr(name, 'ETH');
     return address || null;
   } catch (e) {
