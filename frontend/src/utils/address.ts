@@ -44,7 +44,7 @@ export const lookupEnsName = async (address: string, provider: Provider) => {
 export const lookupCnsName = async (address: string) => {
   try {
     // Send request to get names
-    const resolution = new Resolution();
+    const resolution =  Resolution.infura(String(process.env.INFURA_ID));
     const domain = await resolution.reverse(address);
     return domain;
   } catch (err) {
