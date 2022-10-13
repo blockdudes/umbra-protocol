@@ -280,7 +280,7 @@ export function isDomain(name: string) {
  */
 
 function getResolutionInstance() {
-  return new Resolution();
+  return Resolution.infura(String(process.env.INFURA_ID));
 }
 
 /**
@@ -314,7 +314,7 @@ async function resolveCns(name: string) {
   try {
     const resolution = getResolutionInstance();
     const address = await resolution.addr(name, 'ETH');
-    return address || null;
+    return getAddress(address) || null;
   } catch (e) {
     return null;
   }

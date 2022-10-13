@@ -447,6 +447,7 @@ export default function useWalletStore() {
 
   const userDisplayName = computed(() => {
     if (userCns.value) return userCns.value;
+    if (userEns.value) return userEns.value;
 
     return userAddress.value ? formatNameOrAddress(userAddress.value) : undefined;
   });

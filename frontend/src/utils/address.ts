@@ -2,7 +2,7 @@
  * @notice Helpers for managing and displaying addresses
  */
 
-import {  Provider } from 'components/models';
+import { Provider } from 'components/models';
 import { utils } from '@umbra/umbra-js';
 import { MAINNET_PROVIDER } from 'src/utils/constants';
 import { getAddress, Web3Provider, isHexString } from 'src/utils/ethers';
@@ -44,9 +44,9 @@ export const lookupEnsName = async (address: string, provider: Provider) => {
 export const lookupCnsName = async (address: string) => {
   try {
     // Send request to get names
-    const resolution = new Resolution();
-    const domain = await resolution.reverse(address)
-    return domain
+    const resolution =  Resolution.infura(String(process.env.INFURA_ID));
+    const domain = await resolution.reverse(address);
+    return domain;
   } catch (err) {
     // Scenario that prompted this try/catch was that The Graph API threw with a CORS error on localhost, blocking login
     console.warn('Error in lookupCnsName');
@@ -110,10 +110,10 @@ export const isAddressSafe = async (name: string, userAddress: string, stealthAd
   }
 
   // Check if address is the wallet user is logged in with
-  if (destinationAddress === userAddress) reasons.push(`${i18n.tc('Utils.Address.it')} ${isDomain ? i18n.tc('Utils.Address.resolves-to') : i18n.tc('Utils.Address.is')} ${i18n.tc('Utils.Address.same-addr-as-wallet')}`); // prettier-ignore
+  if (destinationAddress.toLowerCase() === userAddress.toLowerCase()) reasons.push(`${i18n.tc('Utils.Address.it')} ${isDomain ? i18n.tc('Utils.Address.resolves-to') : i18n.tc('Utils.Address.is')} ${i18n.tc('Utils.Address.same-addr-as-wallet')}`); // prettier-ignore
 
   // Check if the address is the stealth address that was sent funds
-  if (destinationAddress === stealthAddress) reasons.push(`${i18n.tc('Utils.Address.it')} ${isDomain ? i18n.tc('Utils.Address.resolves-to') : i18n.tc('Utils.Address.is')} ${i18n.tc('Utils.Address.same-addr-as-stealth')}`); // prettier-ignore
+  if (destinationAddress.toLowerCase() === stealthAddress.toLowerCase()) reasons.push(`${i18n.tc('Utils.Address.it')} ${isDomain ? i18n.tc('Utils.Address.resolves-to') : i18n.tc('Utils.Address.is')} ${i18n.tc('Utils.Address.same-addr-as-stealth')}`); // prettier-ignore
 
   // Check if address owns any POAPs
   if (await hasPOAPs(destinationAddress)) reasons.push(`${isDomain ? i18n.tc('Utils.Address.address-it-resolves-to') : i18n.tc('Utils.Address.it')} ${i18n.tc('Utils.Address.has-poap-tokens')}`); // prettier-ignore
